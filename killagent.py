@@ -1,5 +1,3 @@
-
-
 import time
 import asyncio
 from spade.agent import Agent
@@ -14,20 +12,26 @@ class DummyAgent(Agent):
         async def run(self):
             print("Counter: {}".format(self.counter))
             self.counter += 1
+            if self.counter > 3:
+                self.kill(exit_code=10)
+                return
             await asyncio.sleep(1)
+
+        async def on_end(self):
+            print("Behaviour finished with exit code {}.".format(self.exit_code))
 
     async def setup(self):
         print("Agent starting . . .")
-        b = self.MyBehav()
-        self.add_behaviour(b)
+        self.my_behav = self.MyBehav()
+        self.add_behaviour(self.my_behav)
 
 if __name__ == "__main__":
     dummy = DummyAgent("velasquezerik@01337.io", "u0P765*Yd!")
-    dummy.start()
-    dummy.web.start(hostname="localhost", port="8000")
+    future = dummy.start()
+    future.result()  # Wait until the start method is finished
 
-    print("Wait until user interrupts with ctrl+C")
-    while True:
+    # wait until user interrupts with ctrl+C
+    while not dummy.my_behav.is_killed():
         try:
             time.sleep(1)
         except KeyboardInterrupt:
