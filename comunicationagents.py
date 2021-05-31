@@ -9,7 +9,7 @@ class SenderAgent(Agent):
     class InformBehav(OneShotBehaviour):
         async def run(self):
             print("InformBehav running")
-            msg = Message(to="velasquezerik@01337.io")     # Instantiate the message
+            msg = Message(to="dasiprojectclassifier@01337.io")     # Instantiate the message
             msg.set_metadata("performative", "inform")  # Set the "inform" FIPA performative
             msg.body = "Hello World"                    # Set the message content
 
@@ -48,10 +48,10 @@ class ReceiverAgent(Agent):
 
 
 if __name__ == "__main__":
-    receiveragent = ReceiverAgent("velasquezerik@01337.io", "u0P765*Yd!")
+    receiveragent = ReceiverAgent("dasiprojectclassifier@01337.io", "1q2w3e4r5t")
     future = receiveragent.start()
     future.result() # wait for receiver agent to be prepared.
-    senderagent = SenderAgent("velasquezerik2@01337.io", "u0P765*Yd!")
+    senderagent = SenderAgent("dasiprojectsender@01337.io", "1q2w3e4r5t")
     senderagent.start()
 
     while receiveragent.is_alive():

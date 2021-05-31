@@ -9,7 +9,7 @@ class PeriodicSenderAgent(Agent):
     class InformBehav(PeriodicBehaviour):
         async def run(self):
             print(f"PeriodicSenderBehaviour running at {datetime.datetime.now().time()}: {self.counter}")
-            msg = Message(to="velasquezerik@01337.io")  # Instantiate the message
+            msg = Message(to="dasiprojectclassifier@01337.io")  # Instantiate the message
             msg.body = "Hello World"  # Set the message content
 
             await self.send(msg)
@@ -54,10 +54,10 @@ class ReceiverAgent(Agent):
 
 
 if __name__ == "__main__":
-    receiveragent = ReceiverAgent("velasquezerik@01337.io", "u0P765*Yd!")
+    receiveragent = ReceiverAgent("dasiprojectclassifier@01337.io", "1q2w3e4r5t")
     future = receiveragent.start()
     future.result() # wait for receiver agent to be prepared.
-    senderagent = PeriodicSenderAgent("velasquezerik2@01337.io", "u0P765*Yd!")
+    senderagent = PeriodicSenderAgent("dasiprojectsender@01337.io", "1q2w3e4r5t")
     senderagent.start()
 
     while receiveragent.is_alive():

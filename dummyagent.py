@@ -22,7 +22,7 @@ class DummyAgent(Agent):
         self.add_behaviour(b)
 
 if __name__ == "__main__":
-    dummy = DummyAgent("velasquezerik@01337.io", "u0P765*Yd!")
+    dummy = DummyAgent("dasiprojectsender@01337.io", "1q2w3e4r5t")
     dummy.start()
     dummy.web.start(hostname="localhost", port="8000")
 
