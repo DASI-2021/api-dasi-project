@@ -78,4 +78,3 @@ y_pred = loaded_model.predict(X_test)
 print(confusion_matrix(y_test,y_pred))
 print(classification_report(y_test,y_pred))
 print(accuracy_score(y_test, y_pred))
-
