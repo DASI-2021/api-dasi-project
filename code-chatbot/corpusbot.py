@@ -1,7 +1,7 @@
-from chatterbot import ChatBot
-from chatterbot.trainers import ChatterBotCorpusTrainer
 import logging
 
+from chatterbot import ChatBot
+from chatterbot.trainers import ChatterBotCorpusTrainer
 
 '''
 This is an example showing how to train a chat bot using the

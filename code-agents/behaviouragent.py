@@ -1,5 +1,6 @@
-import time
 import datetime
+import time
+
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour, PeriodicBehaviour
 from spade.message import Message

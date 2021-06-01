@@ -1,6 +1,5 @@
 from chatterbot import ChatBot
 
-
 # Uncomment the following lines to enable verbose logging
 # import logging
 # logging.basicConfig(level=logging.INFO)

@@ -1,10 +1,12 @@
-import time
 import datetime
+import time
+
 from spade import quit_spade
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour, PeriodicBehaviour
 from spade.message import Message
 from spade.template import Template
+
 
 class SenderAgent(Agent):
     class InformBehav(PeriodicBehaviour):

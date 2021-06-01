@@ -1,144 +1,26 @@
-from flask import Flask, render_template, request
+import time
+
 from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
-import time
-import datetime
+from flask import Flask, render_template, request
+from utils import SenderAgent
+from classifier import ClassificationAgent
+from extractions import ExtractionAgent
 from spade import quit_spade
-from spade.agent import Agent
-from spade.behaviour import CyclicBehaviour, PeriodicBehaviour
-from spade.message import Message
-from spade.template import Template
 
-class SenderAgent(Agent):
-    class InformBehav(PeriodicBehaviour):
-    #class InformBehav(CyclicBehaviour):
-        async def run(self):
-
-            if self.agent.has_message :
-                print(f"SenderAgent: running at {datetime.datetime.now().time()}: {self.counter}")
-                
-                msg = Message(to=self.agent.recv_jid)  # Instantiate the message
-
-                msg.set_metadata(
-                    "performative", "inform"
-                )  # Set the "inform" FIPA performative
-                msg.body = str(f"Hello word at {datetime.datetime.now().time()}: {self.counter}")
-
-                await self.send(msg)
-
-                print("SenderAgent: Message sent!")
-
-                self.counter += 1
-
-                msg = await self.receive(timeout=10)
-                
-                if msg:
-                    print("SenderAgent: Response Message received: {}".format(msg.body))
-                else:
-                    print("SenderAgent: Did not received any response message after 10 seconds")
-                
-                self.agent.has_message = False
-
-        async def on_end(self):
-            # stop agent from behaviour
-            await self.agent.stop()
-
-        async def on_start(self):
-            self.counter = 0
-
-    async def setup(self):
-        print(f"SenderAgent: started at {datetime.datetime.now().time()}")
-        start_at = datetime.datetime.now() + datetime.timedelta(seconds=5)
-        b = self.InformBehav(period=2, start_at=start_at)
-        #b = self.InformBehav()
-        self.add_behaviour(b)
-    
-    def __init__(self, *args, **kwargs):
-        self.recv_jid = None
-        self.has_message = False
-        self.message_to_send = ""
-        super().__init__(*args, **kwargs)
-    
-    def send_message(self, recv_jid, message_to_send):
-        self.recv_jid = recv_jid
-        self.has_message = True
-        self.message_to_send = message_to_send
-
-
-class ClasificationAgent(Agent):
-    class RecvBehav(CyclicBehaviour):
-        async def run(self):
-            # print("ClasificationAgent: Agent running")
-
-            msg = await self.receive(timeout=1)
-            
-            if msg:
-                print("ClasificationAgent: Message received with content: {}".format(msg.body))
-
-                msg = Message(to=self.agent.recv_jid)  # Instantiate the message
-                msg.set_metadata(
-                    "performative", "inform"
-                )  # Set the "inform" FIPA performative
-                msg.body = str(f"ClasificationAgent: Message Received {datetime.datetime.now().time()}")
-                await self.send(msg)
-
-        async def on_end(self):
-            await self.agent.stop()
-
-    async def setup(self):
-        print("ClasificationAgent: started")
-        b = self.RecvBehav()
-        template = Template()
-        template.set_metadata("performative", "inform")
-        self.add_behaviour(b, template)
-    
-    def __init__(self, recv_jid, *args, **kwargs):
-        self.recv_jid = recv_jid
-        super().__init__(*args, **kwargs)
-
-class ExtractionAgent(Agent):
-    class RecvBehav(CyclicBehaviour):
-        async def run(self):
-            # print("ExtractionAgent: Agent running")
-
-            msg = await self.receive(timeout=1)
-
-            if msg:
-                print("ExtractionAgent: Message received with content: {}".format(msg.body))
-
-                msg = Message(to=self.agent.recv_jid)  # Instantiate the message
-                msg.set_metadata(
-                    "performative", "inform"
-                )  # Set the "inform" FIPA performative
-                msg.body = str(f"ExtractionAgent: Message Received {datetime.datetime.now().time()}")
-                await self.send(msg)
-
-        async def on_end(self):
-            await self.agent.stop()
-
-    async def setup(self):
-        print("ExtractionAgent: started")
-        b = self.RecvBehav()
-        template = Template()
-        template.set_metadata("performative", "inform")
-        self.add_behaviour(b, template)
-    
-    def __init__(self, recv_jid, *args, **kwargs):
-        self.recv_jid = recv_jid
-        super().__init__(*args, **kwargs)
 
 status = 0
 
 sender_jid = "dasiprojectsender@01337.io"
 sender_passwd = "1q2w3e4r5t"
 
-recv_jid = "dasiprojectclassifier@01337.io"
-recv_passwd = "1q2w3e4r5t"
+classification_jid = "dasiprojectclassifier@01337.io"
+classification_passwd = "1q2w3e4r5t"
 
 extraction_jid = "dasiprojectextraction@01337.io"
 extraction_passwd = "1q2w3e4r5t"
 
-clasificationAgent = None
+classificationAgent = None
 senderagent = None
 
 app = Flask(__name__)
@@ -155,25 +37,43 @@ def home():
 def get_bot_response():
     global status
     global senderagent
-    global recv_jid
+    global classification_jid
+    global extraction_jid
     userText = request.args.get('msg')
 
     if( userText == "add"):
         status = 1
-        return str("Agrega la nueva noticia")
+        return str("Please add the new news!")
     
     if( userText == "news"):
         status = 0
-        return str("Mostrando nueva noticia")
+        result = "This is the new news!\n"
+        result += "News!\n"
+        return str(result)
 
     if( userText == "exit"):
         status = 0
-        return str("Reiniciando status del bot")
+        return str("Resetting chatbot status")
     
     if( status == 1):
         status = 0
-        senderagent.send_message(recv_jid, "Hola")
-        return str("Noticia Enviada para clasificar y Extraer información")
+        result = ""
+
+        # classification
+        senderagent.send_message(classification_jid, str(userText))
+        time.sleep(2)
+        result += senderagent.get_classification_message()
+
+        time.sleep(2)
+        result += "\n\n"
+
+        # extraction
+        senderagent.send_message(extraction_jid, str(userText), False)
+        time.sleep(2)
+        result += senderagent.get_extraction_message()
+        # send_agent_message(senderagent, extraction_jid, str(userText))
+
+        return str(result)
 
     if (status == 0):
         return str(english_bot.get_response(userText))
@@ -181,9 +81,13 @@ def get_bot_response():
 
 if __name__ == "__main__":
 
-    clasificationAgent = ClasificationAgent(sender_jid, recv_jid, recv_passwd)
-    future = clasificationAgent.start()
-    future.result() # wait for receiver agent to be prepared.
+    classificationAgent = ClassificationAgent(sender_jid, classification_jid, classification_passwd)
+    future_classification = classificationAgent.start()
+    future_classification.result() # wait for receiver agent to be prepared.
+
+    extractionAgent = ExtractionAgent(sender_jid, extraction_jid, extraction_passwd)
+    future_extraction = extractionAgent.start()
+    future_extraction.result() # wait for receiver agent to be prepared.
 
     senderagent = SenderAgent(sender_jid, sender_passwd)
     senderagent.start()
