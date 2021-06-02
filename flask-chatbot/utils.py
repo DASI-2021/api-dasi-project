@@ -17,7 +17,7 @@ class SenderAgent(Agent):
                 msg.set_metadata(
                     "performative", "inform"
                 )  # Set the "inform" FIPA performative
-                msg.body = str(f"Hello word at {datetime.datetime.now().time()}: {self.counter}")
+                msg.body = str(f"{self.agent.message_to_send}")
 
                 await self.send(msg)
 
