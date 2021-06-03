@@ -67,9 +67,9 @@ def get_bot_response():
         result += "\n\n"
 
         # extraction
-        # senderagent.send_message(extraction_jid, str(userText), False)
-        # time.sleep(2)
-        # result += senderagent.get_extraction_message()
+        senderagent.send_message(extraction_jid, str(userText), False)
+        time.sleep(2)
+        result += senderagent.get_extraction_message()
         # send_agent_message(senderagent, extraction_jid, str(userText))
 
         return str(result)
