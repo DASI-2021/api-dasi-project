@@ -19,8 +19,8 @@ $ python3 -m venv api-dasi-project
 $ source api-dasi-project/bin/activate
 (api-dasi-project) $ pip install -r requirements.txt
 (api-dasi-project) $ python flask-chatbot/app.py
-# The demo will be live at [http://localhost:5000/](http://localhost:5000/)
 ```
+The demo will be live at [http://localhost:5000/](http://localhost:5000/)
 
 ### Pipenv
 
@@ -29,5 +29,5 @@ $ pipenv install
 $ pipenv shell
 (api-dasi-project) $ pip install -r requirements.txt
 (api-dasi-project) $ python flask-chatbot/app.py
-# The demo will be live at [http://localhost:5000/](http://localhost:5000/)
 ```
+The demo will be live at [http://localhost:5000/](http://localhost:5000/)

@@ -10,6 +10,8 @@ nltk.download('maxent_ne_chunker')
 nltk.download('words')
 from nltk.corpus import stopwords
 
+import json
+
 stop = stopwords.words('english')
 
 def extract_phone_numbers(string):
@@ -54,11 +56,15 @@ class ExtractionAgent(Agent):
                 result += "Emails: " + str(extract_email_addresses(msg.body))
                 result += "Names: " + str(extract_names(msg.body))
 
+                myDict = {'phones':extract_phone_numbers(msg.body), 'emails':extract_email_addresses(msg.body), 'names':extract_names(msg.body)}
+                jsonStr = json.dumps(myDict)
+
                 msg = Message(to=self.agent.recv_jid)  # Instantiate the message
                 msg.set_metadata(
                     "performative", "inform"
                 )  # Set the "inform" FIPA performative
-                msg.body = str(f"ExtractionAgent: Message Received {datetime.datetime.now().time()}, Result: {result}")
+                # msg.body = str(f"ExtractionAgent: Message Received {datetime.datetime.now().time()}, Result: {result}")
+                msg.body = str(f"{jsonStr}")
                 await self.send(msg)
 
         async def on_end(self):
