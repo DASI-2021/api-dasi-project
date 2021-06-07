@@ -81,7 +81,7 @@ def get_bot_response():
 
         # extraction
         senderagent.send_message(extraction_jid, str(userText), False)
-        time.sleep(2)
+        time.sleep(3)
         extraction_result = senderagent.get_extraction_message()
         result += extraction_result
 
@@ -113,7 +113,7 @@ def get_bot_response():
         new_news = str(userText)
         # extraction
         senderagent.send_message(extraction_jid, str(userText), False)
-        time.sleep(2)
+        time.sleep(3)
         extraction_result = senderagent.get_extraction_message()
         result += extraction_result
 
